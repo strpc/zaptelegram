@@ -12,6 +12,8 @@ Basic usage:
 package main
 
 import (
+	"time"
+	
 	"github.com/strpc/zaptelegram"
 	"go.uber.org/zap"
 )
@@ -26,6 +28,7 @@ func main() {
 	
 	logger.Warn("first event")  // by default hook handled level Warn and higher
 	logger.Error("second event")
+	time.Sleep(time.Millisecond * 500)
 }
 ```
 ---

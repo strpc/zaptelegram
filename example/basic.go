@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/strpc/zaptelegram"
 	"go.uber.org/zap"
 )
@@ -14,4 +16,5 @@ func main() {
 	logger = logger.WithOptions(zap.Hooks(telegramHook.GetHook()))
 	logger.Info("foo")
 	logger.Error("bar")
+	time.Sleep(time.Millisecond * 500)
 }
