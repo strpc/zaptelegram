@@ -40,6 +40,9 @@ package main
 
 import (
 	"fmt"
+	"context"
+	"time"
+	
 	"github.com/strpc/zaptelegram"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -47,7 +50,8 @@ import (
 
 func main() {
 	logger, _ := zap.NewProduction()
-
+    
+	ctx := context.Background()
 	zaptelegram.BaseAPIURL = "https://localhost:8000/botapi" // change telegram bot api url
 	telegramHook, _ := zaptelegram.NewTelegramHook(
 		"0123456789:XXXXXXXXXXXXXXXXXXXXYYYYYYYYYYYYYYY",
@@ -61,6 +65,7 @@ func main() {
 		zaptelegram.WithFormatter(func(e zapcore.Entry) string {
 			return fmt.Sprintf("service: auth service\n%s - %s - %s", e.Time, e.Level, e.Message)
 		}),  // set custom format message.
+		zaptelegram.WithQueue(ctx, 3*time.Second, 1000),  // send messages by batches
 	)
 
 	logger = logger.WithOptions(zap.Hooks(telegramHook.GetHook()))

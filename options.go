@@ -1,6 +1,7 @@
 package zaptelegram
 
 import (
+	"context"
 	"time"
 
 	"go.uber.org/zap/zapcore"
@@ -46,7 +47,23 @@ func WithFormatter(f func(e zapcore.Entry) string) Option {
 
 func WithoutAsyncOpt() Option {
 	return func(h *TelegramHook) error {
+		if h.queue {
+			return AsyncOptError
+		}
 		h.async = false
+		return nil
+	}
+}
+
+func WithQueue(ctx context.Context, interval time.Duration, queueSize int) Option {
+	return func(h *TelegramHook) error {
+		h.async = false
+		h.queue = true
+		h.intervalQueue = interval
+		h.entriesChan = make(chan zapcore.Entry, queueSize)
+		go func() {
+			_ = h.consumeEntriesQueue(ctx)
+		}()
 		return nil
 	}
 }
